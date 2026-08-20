@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PharmaCare | Pharmacy Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✚</div>
+        <div><strong>PharmaCare</strong><span>Management System</span></div>
+      </div>
+      <nav>
+        <button class="nav-item active" data-section="dashboard"><span>▦</span> Dashboard</button>
+        <button class="nav-item" data-section="medicines"><span>💊</span> Medicines</button>
+        <button class="nav-item" data-section="suppliers"><span>🚚</span> Suppliers</button>
+        <button class="nav-item" data-section="customers"><span>👥</span> Customers</button>
+        <button class="nav-item" data-section="sales"><span>🧾</span> Sales & Billing</button>
+        <button class="nav-item" data-section="prescriptions"><span>📋</span> Prescriptions</button>
+        <button class="nav-item" data-section="reports"><span>📊</span> Reports</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="support-card"><div>Need help?</div><small>Manage your pharmacy with ease.</small><button>Support Center</button></div>
+        <button class="logout">↪ Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div class="page-heading"><span>Good morning, Admin</span><h1 id="sectionTitle">Dashboard</h1></div>
+        <div class="top-actions">
+          <div class="search"><span>⌕</span><input id="globalSearch" placeholder="Search medicines, customers..."></div>
+          <button class="icon-btn">🔔<i></i></button>
+          <div class="profile"><div class="avatar">AD</div><div><b>Admin</b><small>Administrator</small></div></div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section id="dashboard" class="section active">
+          <div class="welcome">
+            <div><p class="eyebrow">PHARMACY OVERVIEW</p><h2>Your pharmacy at a glance</h2><p>Monitor inventory, sales, orders and expiry alerts from one place.</p></div>
+            <button class="primary" onclick="openMedicineModal()">＋ Add Medicine</button>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon purple">💊</div><div><span>Total Medicines</span><strong id="statMedicines">0</strong><small class="up">Live inventory</small></div></div>
+            <div class="stat-card"><div class="stat-icon green">₹</div><div><span>Today's Sales</span><strong id="statSales">₹0</strong><small class="up">Sales overview</small></div></div>
+            <div class="stat-card"><div class="stat-icon orange">⚠</div><div><span>Low Stock</span><strong id="statLow">0</strong><small>Needs attention</small></div></div>
+            <div class="stat-card"><div class="stat-icon red">⌛</div><div><span>Expiring Soon</span><strong id="statExpiry">0</strong><small>Within 90 days</small></div></div>
+          </div>
+          <div class="dashboard-grid">
+            <div class="panel large"><div class="panel-head"><div><h3>Medicine Inventory</h3><p>Latest medicines in your pharmacy</p></div><button class="ghost" onclick="showSection('medicines')">View all →</button></div><div class="table-wrap"><table><thead><tr><th>Medicine</th><th>Category</th><th>Stock</th><th>Expiry</th><th>Status</th></tr></thead><tbody id="dashboardMedicineRows"></tbody></table></div></div>
+            <div class="panel"><div class="panel-head"><div><h3>Stock Health</h3><p>Current inventory condition</p></div></div><div class="health"><div class="donut"><span id="healthPercent">0%</span></div><div><b>Healthy Stock</b><p id="healthText">Loading...</p></div></div><div class="mini-row"><span><i class="dot green-dot"></i> Healthy</span><b id="healthyCount">0</b></div><div class="mini-row"><span><i class="dot orange-dot"></i> Low stock</span><b id="lowCount">0</b></div><div class="mini-row"><span><i class="dot red-dot"></i> Expiring</span><b id="expiryCount">0</b></div></div>
+          </div>
+        </section>
+
+        <section id="medicines" class="section">
+          <div class="section-toolbar"><div><p class="eyebrow">INVENTORY</p><h2>Medicine Management</h2><p>Add, update, search and delete medicines.</p></div><button class="primary" onclick="openMedicineModal()">＋ Add Medicine</button></div>
+          <div class="panel"><div class="filterbar"><input id="medicineSearch" placeholder="Search medicine or category..." oninput="renderMedicines()"><select id="categoryFilter" onchange="renderMedicines()"><option value="">All categories</option><option>Tablet</option><option>Capsule</option><option>Syrup</option><option>Injection</option><option>Cream</option><option>Drops</option></select><button class="ghost" onclick="loadMedicines()">↻ Refresh</button></div><div class="table-wrap"><table><thead><tr><th>Medicine</th><th>Category</th><th>Batch</th><th>Price</th><th>Stock</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead><tbody id="medicineRows"></tbody></table></div></div>
+        </section>
+
+        <section id="suppliers" class="section"><div class="section-toolbar"><div><p class="eyebrow">PARTNERS</p><h2>Supplier Management</h2><p>Manage your medicine suppliers and contacts.</p></div><button class="primary" onclick="openGenericModal('supplier')">＋ Add Supplier</button></div><div class="panel"><div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Contact</th><th>Email</th><th>Company</th><th>Actions</th></tr></thead><tbody id="supplierRows"></tbody></table></div></div></section>
+
+        <section id="customers" class="section"><div class="section-toolbar"><div><p class="eyebrow">CUSTOMERS</p><h2>Customer Management</h2><p>Maintain customer profiles and contact details.</p></div><button class="primary" onclick="openGenericModal('customer')">＋ Add Customer</button></div><div class="panel"><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Email</th><th>Address</th><th>Actions</th></tr></thead><tbody id="customerRows"></tbody></table></div></div></section>
+
+        <section id="sales" class="section"><div class="section-toolbar"><div><p class="eyebrow">TRANSACTIONS</p><h2>Sales & Billing</h2><p>Sales dashboard ready for billing integration.</p></div><button class="primary">＋ New Bill</button></div><div class="empty-state"><div>🧾</div><h3>Billing workspace</h3><p>Connect your sales collection to generate invoices, payment records and sales history.</p></div></section>
+        <section id="prescriptions" class="section"><div class="section-toolbar"><div><p class="eyebrow">PRESCRIPTIONS</p><h2>Prescription Management</h2><p>Review prescriptions and prepare medicines for customers.</p></div><button class="primary">＋ Upload Prescription</button></div><div class="empty-state"><div>📋</div><h3>Prescription workspace</h3><p>The prescription workflow can be connected to the backend next.</p></div></section>
+        <section id="reports" class="section"><div class="section-toolbar"><div><p class="eyebrow">ANALYTICS</p><h2>Reports</h2><p>Monitor inventory, sales and operational performance.</p></div><button class="ghost">Export Report</button></div><div class="report-cards"><div class="report-card"><span>Inventory report</span><b>Medicine stock & expiry</b></div><div class="report-card"><span>Sales report</span><b>Daily / monthly revenue</b></div><div class="report-card"><span>Supplier report</span><b>Purchase activity</b></div></div></section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="medicineModal">
+    <div class="modal">
+      <div class="modal-head"><div><h3 id="medicineModalTitle">Add Medicine</h3><p>Enter medicine details below.</p></div><button onclick="closeModal('medicineModal')">×</button></div>
+      <form id="medicineForm">
+        <input type="hidden" id="medicineId">
+        <div class="form-grid">
+          <label>Medicine Name<input id="name" required placeholder="e.g. Paracetamol 500mg"></label>
+          <label>Category<select id="category" required><option value="">Select</option><option>Tablet</option><option>Capsule</option><option>Syrup</option><option>Injection</option><option>Cream</option><option>Drops</option></select></label>
+          <label>Batch Number<input id="batch" required placeholder="BTH-2026-001"></label>
+          <label>Price (₹)<input id="price" type="number" min="0" step="0.01" required></label>
+          <label>Stock Quantity<input id="stock" type="number" min="0" required></label>
+          <label>Expiry Date<input id="expiry" type="date" required></label>
+          <label class="full">Supplier<input id="supplier" placeholder="Supplier name"></label>
+        </div>
+        <div class="modal-actions"><button type="button" class="ghost" onclick="closeModal('medicineModal')">Cancel</button><button class="primary" type="submit">Save Medicine</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="genericModal">
+    <div class="modal small-modal">
+      <div class="modal-head"><div><h3 id="genericTitle">Add Record</h3><p>Save the record to the database.</p></div><button onclick="closeModal('genericModal')">×</button></div>
+      <form id="genericForm"><input type="hidden" id="genericId"><input type="hidden" id="genericType">
+        <label>Name<input id="genericName" required></label><label>Phone<input id="genericPhone"></label><label>Email<input id="genericEmail" type="email"></label><label id="genericExtraLabel">Company / Address<input id="genericExtra"></label>
+        <div class="modal-actions"><button type="button" class="ghost" onclick="closeModal('genericModal')">Cancel</button><button class="primary">Save</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
